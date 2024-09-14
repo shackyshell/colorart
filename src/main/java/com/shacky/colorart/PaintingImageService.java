@@ -23,8 +23,8 @@ public class PaintingImageService {
     private ColorRangeGenerator generator;
 
     @Transactional
-    public void scrapeAndStoreImages() throws IOException {
-        List<String> imageUrls = scraperService.scrapeImageUrls();
+    public void scrapeAndStoreImages(Optional<String> url) throws IOException {
+        List<String> imageUrls = scraperService.scrapeImageUrls(url);
 
         for (String imageUrl : imageUrls) {
             List<String> colors = colorExtractor.extractDominantColors(imageUrl);

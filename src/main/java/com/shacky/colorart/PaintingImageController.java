@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -19,8 +20,8 @@ public class PaintingImageController {
     private WindowsFileHelperService windowsFileHelperService;
 
     @PostMapping("/scrape")
-    public String scrapeAndStoreImages() throws IOException {
-        paintingImageService.scrapeAndStoreImages();
+    public String scrapeAndStoreImages(@RequestParam Optional<String> url) throws IOException {
+        paintingImageService.scrapeAndStoreImages(url);
         return "Images scraped and saved successfully!";
     }
 
