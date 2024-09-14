@@ -15,6 +15,9 @@ public class PaintingImageController {
     @Autowired
     private PaintingImageService paintingImageService;
 
+    @Autowired
+    private WindowsFileHelperService windowsFileHelperService;
+
     @PostMapping("/scrape")
     public String scrapeAndStoreImages() throws IOException {
         paintingImageService.scrapeAndStoreImages();
@@ -24,6 +27,12 @@ public class PaintingImageController {
     @GetMapping
     public List<PaintingImage> getImagesByColor(@RequestParam String color) {
         return paintingImageService.findImagesByColor(color);
+    }
+
+    @GetMapping("/open-images")
+    public String getCommandToOpenAllTheImagesFoundByColor(@RequestParam String color) {
+        List<PaintingImage> images = paintingImageService.findImagesByColor(color);
+        return windowsFileHelperService.getCommandToOpenAllTheImagesInTheBrowser(images);
     }
 
     // Endpoint to return all dominant colors

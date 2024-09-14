@@ -81,7 +81,7 @@ public class ColorRangeGenerator {
     }
 
     // HSL to hex color conversion
-    private String hslToHex(float hue, float saturation, float lightness) {
+    String hslToHex(float hue, float saturation, float lightness) {
         float r, g, b;
 
         if (saturation == 0) {

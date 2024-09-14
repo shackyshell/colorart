@@ -38,8 +38,16 @@ public class PaintingImageService {
     }
 
     public List<PaintingImage> findImagesByColor(String hexColor) {
-        List<String> colors = generator.generateSaturationRange(hexColor);
-//        return repository.findByColorsContaining(hexColor);
+        float[] searchedHslColor =generator.hexToHSL(hexColor);
+        List<String> hexColors = getAllDominantColors();
+        List<float[]> hslColors = new ArrayList<>();
+        for (String hex : hexColors) {
+            float[] hslColor = generator.hexToHSL(hex);
+            if (generator.colorDistance(searchedHslColor, hslColor) < SIMILARITY_THRESHOLD) {
+                hslColors.add(hslColor);
+            }
+        }
+        List<String> colors = hslColors.stream().map(color -> generator.hslToHex(color[0], color[1], color[2])).toList();
         return repository.findByColorsIn(colors);
     }
 
