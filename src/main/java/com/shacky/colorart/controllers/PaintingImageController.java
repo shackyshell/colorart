@@ -23,8 +23,8 @@ public class PaintingImageController {
     private WindowsFileHelperService windowsFileHelperService;
 
     @PostMapping("/scrape")
-    public String scrapeAndStoreImages(@RequestParam Optional<String> url) throws IOException {
-        paintingImageService.scrapeAndStoreImages(url);
+    public String scrapeAndStoreImages(@RequestParam Optional<String> url, @RequestParam Optional<Integer> distinguishableColorsThresholdPercentage) throws IOException {
+        paintingImageService.scrapeAndStoreImages(url, distinguishableColorsThresholdPercentage);
         return "Images scraped and saved successfully!";
     }
 
@@ -34,13 +34,13 @@ public class PaintingImageController {
     }
 
     @GetMapping
-    public List<PaintingImage> getImagesByColor(@RequestParam Optional<String> color) {
-        return paintingImageService.findImagesByColor(color);
+    public List<PaintingImage> getImagesByColor(@RequestParam Optional<String> color, @RequestParam Optional<Integer> similarityThresholdPercentage) {
+        return paintingImageService.findImagesByColor(color, similarityThresholdPercentage);
     }
 
     @GetMapping("/open-images")
-    public String getCommandToOpenAllTheImagesFoundByColor(@RequestParam Optional<String> color) {
-        List<PaintingImage> images = paintingImageService.findImagesByColor(color);
+    public String getCommandToOpenAllTheImagesFoundByColor(@RequestParam Optional<String> color, @RequestParam Optional<Integer> similarityThresholdPercentage) {
+        List<PaintingImage> images = paintingImageService.findImagesByColor(color, similarityThresholdPercentage);
         return windowsFileHelperService.getCommandToOpenAllTheImagesInTheBrowser(images);
     }
 

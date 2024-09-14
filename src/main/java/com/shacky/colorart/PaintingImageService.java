@@ -3,12 +3,17 @@ package com.shacky.colorart;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class PaintingImageService {
+
+    Integer defaultDistinguishableColorsThresholdPercentage = 20;
+    Integer similarityThreshold = 20;
+    double similarityThresholdPercentage = 20.0/100;
 
     @Autowired
     private PaintingImageRepository repository;
@@ -22,12 +27,22 @@ public class PaintingImageService {
     @Autowired
     private ColorRangeGenerator generator;
 
+    public void setSimilarityThreshold(Integer similarityThreshold) {
+        this.similarityThreshold = similarityThreshold;
+        this.similarityThresholdPercentage = (float)similarityThreshold/100;
+    }
+
     @Transactional
-    public void scrapeAndStoreImages(Optional<String> url) throws IOException {
+    public void scrapeAndStoreImages(Optional<String> url, Optional<Integer> distinguishableColorsThresholdPercentage) throws IOException {
         List<String> imageUrls = scraperService.scrapeImageUrls(url);
 
         for (String imageUrl : imageUrls) {
-            List<String> colors = colorExtractor.extractDominantColors(imageUrl);
+            List<String> colors = colorExtractor.extractDominantColors(
+                    imageUrl,
+                    distinguishableColorsThresholdPercentage.isPresent()  ?
+                            distinguishableColorsThresholdPercentage.get()
+                            : defaultDistinguishableColorsThresholdPercentage
+            );
 
             PaintingImage image = new PaintingImage();
             image.setImageUrl(imageUrl);
@@ -41,7 +56,10 @@ public class PaintingImageService {
         return repository.findAll();
     }
 
-    public List<PaintingImage> findImagesByColor(Optional<String> hexColor) {
+    public List<PaintingImage> findImagesByColor(Optional<String> hexColor, Optional<Integer> similarityThreshold) {
+        if (similarityThreshold.isPresent()) {
+            setSimilarityThreshold(similarityThreshold.get());
+        }
         if (!hexColor.isPresent()) {
             return getAllImages();
         }
@@ -50,7 +68,7 @@ public class PaintingImageService {
         List<float[]> hslColors = new ArrayList<>();
         for (String hex : hexColors) {
             float[] hslColor = generator.hexToHSL(hex);
-            if (generator.colorDistance(searchedHslColor, hslColor) < SIMILARITY_THRESHOLD) {
+            if (generator.colorDistance(searchedHslColor, hslColor) < similarityThresholdPercentage) {
                 hslColors.add(hslColor);
             }
         }
@@ -68,8 +86,6 @@ public class PaintingImageService {
                 .flatMap(painting -> painting.getColors().stream())
                 .collect(Collectors.toList());
     }
-
-    private static final double SIMILARITY_THRESHOLD = 0.2; // Adjust based on requirements
 
     // Group colors by similarity
     public Map<Integer, List<String>> groupColors(List<String> hexColors) {
@@ -89,7 +105,7 @@ public class PaintingImageService {
                 grouped[i] = true;
 
                 for (int j = 0; j < hexColors.size(); j++) {
-                    if (i != j && !grouped[j] && generator.colorDistance(hslColors.get(i), hslColors.get(j)) < SIMILARITY_THRESHOLD) {
+                    if (i != j && !grouped[j] && generator.colorDistance(hslColors.get(i), hslColors.get(j)) < similarityThresholdPercentage) {
                         group.add(hexColors.get(j));
                         grouped[j] = true;
                     }

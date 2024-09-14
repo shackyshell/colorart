@@ -55,11 +55,19 @@
 <body>
 <div class="container">
     <div class="box">
+        <p>distinguish colors with a difference higher than [%]</p>
+        <input type="number" min="0" max="100" id="distinguishableColorsThresholdInput" placeholder="distinguish colors with a difference higher than [%]">
+    </div>
+    <div class="box">
         <input type="text" id="scrapeUrlInput" placeholder="Enter url to scrape">
         <button id="scrapeButton">Scrape</button>
     </div>
     <div class="box">
-        <input type="text" id="inputField" placeholder="Enter hex">
+        <p>similarity of colors lower than [%]</p>
+        <input type="number" min="0" max="100" id="similarityThresholdInput" placeholder="similarity of colors lower than [%]">
+    </div>
+    <div class="box">
+               <input type="text" id="inputField" placeholder="Enter hex">
         <button id="sendButton">Load images</button>
     </div>
     <div id="response2Container" class="box"></div>
@@ -78,10 +86,11 @@
         function sendRequest() {
             const inputField = document.getElementById('inputField');
             const value = inputField.value;
+            const similarityThresholdPercentage = similarityThresholdInput.value;
 
             const apiUrl = 'http://localhost:8080/api/images'; // Replace with your API URL
 
-            fetch(`${apiUrl}${value && `?color=${encodeURIComponent(value)}`}`)
+            fetch(`${apiUrl}?similarityThresholdPercentage=${similarityThresholdPercentage}${value && `&color=${encodeURIComponent(value)}`}`)
                 .then(response => response.json())
                 .then(data => {
                 let innerHtml = '<div class="box flex">';
@@ -110,6 +119,10 @@
         }
 
 </script>
+<script type="text/javascript">
+  document.getElementById("distinguishableColorsThresholdInput").setAttribute('value',20);
+  document.getElementById("similarityThresholdInput").setAttribute('value',20);
+</script>
 <script>
         document.getElementById('scrapeButton').addEventListener('click', sendRequest);
 
@@ -126,10 +139,11 @@
         document.getElementById('response2Container').innerText = 'is loading...';
             const scrapeUrlInput = document.getElementById('scrapeUrlInput');
             const value = scrapeUrlInput.value;
+            const distinguishableColorsThresholdPercentage = distinguishableColorsThresholdInput.value || 20;
 
             const apiUrl = 'http://localhost:8080/api/images/scrape';
 
-            fetch(`${apiUrl}${value && `?url=${encodeURIComponent(value)}`}`, {
+            fetch(`${apiUrl}?distinguishableColorsThresholdPercentage=${distinguishableColorsThresholdPercentage}${value && `&url=${encodeURIComponent(value)}`}`, {
     method: 'POST'})
                 .then(data => {
                     document.getElementById('response2Container').innerText = 'loaded';

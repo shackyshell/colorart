@@ -9,28 +9,7 @@ import java.util.List;
 @Service
 public class ColorRangeGenerator {
 
-    // Function to return a list of hex colors within 30% saturation difference
-    public List<String> generateSaturationRange(String hexColor) {
-        List<String> colorRange = new ArrayList<>();
 
-        // Step 1: Convert hex to HSL
-        float[] hsl = hexToHSL(hexColor);
-        float hue = hsl[0];
-        float saturation = hsl[1];
-        float lightness = hsl[2];
-
-        // Step 2: Define the range for saturation (±30%)
-        float lowerBound = Math.max(0, saturation - 0.3f);
-        float upperBound = Math.min(1, saturation + 0.3f);
-
-        // Step 3: Generate colors within this range
-        for (float s = lowerBound; s <= upperBound; s += 0.05f) {
-            String hex = hslToHex(hue, s, lightness);
-            colorRange.add(hex);
-        }
-
-        return colorRange;
-    }
 
     // Convert hex color to HSL
     float[] hexToHSL(String hex) {
