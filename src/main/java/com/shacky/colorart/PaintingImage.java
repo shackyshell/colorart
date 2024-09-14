@@ -1,8 +1,14 @@
 package com.shacky.colorart;
-import javax.persistence.*;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 @Entity
+@Setter
+@Getter
 public class PaintingImage {
 
     @Id
