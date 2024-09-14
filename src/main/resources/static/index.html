@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Request Example</title>
+    <title>ColorArt</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,6 +28,14 @@
         .box {
          margin-bottom: 10px;
         }
+        .painting {
+        margin: 20px;
+        }
+        .flex {
+         display: flex;
+         flex-wrap: wrap;
+         justify-content: center;
+        }
         .colorSwatch {
         height: 50px;
         width: 50px;
@@ -36,6 +44,10 @@
         .colorSwatchWrapper {
          display: inline-block;
          margin: 10px;
+         display: flex;
+         flex-direction: column;
+         gap: 10px;
+         align-items: center;
         }
 
     </style>
@@ -47,8 +59,8 @@
         <button id="scrapeButton">Scrape</button>
     </div>
     <div class="box">
-        <input type="text" id="inputField" placeholder="Enter something">
-        <button id="sendButton">Send</button>
+        <input type="text" id="inputField" placeholder="Enter hex">
+        <button id="sendButton">Load images</button>
     </div>
     <div id="response2Container" class="box"></div>
     <div id="responseContainer" class="box"></div>
@@ -64,25 +76,32 @@
         });
 
         function sendRequest() {
-        document.getElementById('responseContainer').innerHTML = '<div class="colorSwatch" style="background: pink;">lalala</div>';
             const inputField = document.getElementById('inputField');
             const value = inputField.value;
 
-<!--            if (!value) {-->
-<!--                alert('Please enter a value.');-->
-<!--                return;-->
-<!--            }-->
+            const apiUrl = 'http://localhost:8080/api/images'; // Replace with your API URL
 
-            const apiUrl = 'http://localhost:8080/api/images/colors'; // Replace with your API URL
-
-            fetch(`${apiUrl}?query=${encodeURIComponent(value)}`)
+            fetch(`${apiUrl}${value && `?color=${encodeURIComponent(value)}`}`)
                 .then(response => response.json())
                 .then(data => {
-                console.log('jul', data);
-                let innerHtml = '';
+                let innerHtml = '<div class="box flex">';
                 data.forEach((element) => {
-                innerHtml = innerHtml + `<div class="colorSwatchWrapper"><div class="colorSwatch" style="background: ${element};"></div>${element}</div>`;
+                let colors = element.colors
+                let colorsInnerHtml = '';
+                colors.forEach((color) => {
+                colorsInnerHtml = colorsInnerHtml + `<div class="colorSwatchWrapper"><div class="colorSwatch" style="background: ${color};"></div>${color}</div>`
                 })
+
+                innerHtml = innerHtml + `
+                <div class="box painting">
+                <img src="${element.imageUrl}"/>
+                <div class="box flex">
+                ${colorsInnerHtml}
+                </div>
+                </div>
+                `;
+                })
+                innerHtml = innerHtml + '</div>';
                     document.getElementById('responseContainer').innerHTML = innerHtml;
                 })
                 .catch(error => {
@@ -108,18 +127,10 @@
             const scrapeUrlInput = document.getElementById('scrapeUrlInput');
             const value = scrapeUrlInput.value;
 
-<!--            if (!value) {-->
-<!--                alert('Please enter a value.');-->
-<!--                return;-->
-<!--            }-->
-
             const apiUrl = 'http://localhost:8080/api/images/scrape';
 
             fetch(`${apiUrl}${value && `?url=${encodeURIComponent(value)}`}`, {
     method: 'POST'})
-<!--                .then(response => {-->
-<!--                isLoading = false;-->
-<!--                return response})-->
                 .then(data => {
                     document.getElementById('response2Container').innerText = 'loaded';
                 })

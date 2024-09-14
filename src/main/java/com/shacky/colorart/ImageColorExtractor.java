@@ -30,11 +30,14 @@ public class ImageColorExtractor {
                 }
             }
 
-            // Step 3: Sort by frequency of color occurrence and pick the top 3
+            List<String> distinguishableColors = ColorRangeGenerator.getDistinguishableColors(colorMap.keySet().stream().map(this::toHex).toList(), 20.0);
+//            System.out.println("jul" + distinguishableColors);
+//            // Step 3: Sort by frequency of color occurrence and pick the top 3
             List<Map.Entry<Integer, Integer>> sortedColors = colorMap.entrySet()
                     .stream()
                     .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-                    .limit(3) // top 3 dominant colors
+                    .filter((colorEntry) -> distinguishableColors.contains( toHex(colorEntry.getKey())))
+                    .limit(10) // top 3 dominant colors
                     .collect(Collectors.toList());
 
             // Step 4: Convert the RGB color values to hex and return the list

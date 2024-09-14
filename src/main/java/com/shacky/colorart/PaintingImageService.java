@@ -37,8 +37,15 @@ public class PaintingImageService {
         }
     }
 
-    public List<PaintingImage> findImagesByColor(String hexColor) {
-        float[] searchedHslColor =generator.hexToHSL(hexColor);
+    public List<PaintingImage> getAllImages() {
+        return repository.findAll();
+    }
+
+    public List<PaintingImage> findImagesByColor(Optional<String> hexColor) {
+        if (!hexColor.isPresent()) {
+            return getAllImages();
+        }
+        float[] searchedHslColor =generator.hexToHSL(hexColor.get());
         List<String> hexColors = getAllDominantColors();
         List<float[]> hslColors = new ArrayList<>();
         for (String hex : hexColors) {

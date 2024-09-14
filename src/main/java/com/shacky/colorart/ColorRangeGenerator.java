@@ -117,4 +117,81 @@ public class ColorRangeGenerator {
         double dl = hsl1[2] - hsl2[2];
         return Math.sqrt(dh * dh + ds * ds + dl * dl);
     }
+
+
+    // Main function to get distinguishable colors
+    public static List<String> getDistinguishableColors(List<String> hexColors, double threshold) {
+        List<String> result = new ArrayList<>();
+
+        for (String color : hexColors) {
+            boolean isDistinguishable = true;
+
+            // Compare the current color with all colors already in the result list
+            for (String existingColor : result) {
+                if (calculateDeltaE(color, existingColor) < threshold) {
+                    isDistinguishable = false;
+                    break;
+                }
+            }
+
+            // If the color is distinguishable from all previous ones, add it to the result
+            if (isDistinguishable) {
+                result.add(color);
+            }
+        }
+        return result;
+    }
+
+    // Function to calculate Delta E (CIE76) between two hex colors
+    public static double calculateDeltaE(String hex1, String hex2) {
+        double[] lab1 = rgbToLab(hexToRgb(hex1));
+        double[] lab2 = rgbToLab(hexToRgb(hex2));
+
+        return Math.sqrt(Math.pow(lab2[0] - lab1[0], 2) +
+                Math.pow(lab2[1] - lab1[1], 2) +
+                Math.pow(lab2[2] - lab1[2], 2));
+    }
+
+    // Convert hex color to RGB
+    public static int[] hexToRgb(String hex) {
+        hex = hex.replace("#", "");
+        int r = Integer.parseInt(hex.substring(0, 2), 16);
+        int g = Integer.parseInt(hex.substring(2, 4), 16);
+        int b = Integer.parseInt(hex.substring(4, 6), 16);
+        return new int[]{r, g, b};
+    }
+
+    // Convert RGB to LAB color space
+    public static double[] rgbToLab(int[] rgb) {
+        // Normalize RGB values
+        double r = rgb[0] / 255.0;
+        double g = rgb[1] / 255.0;
+        double b = rgb[2] / 255.0;
+
+        // Apply gamma correction
+        r = (r > 0.04045) ? Math.pow((r + 0.055) / 1.055, 2.4) : (r / 12.92);
+        g = (g > 0.04045) ? Math.pow((g + 0.055) / 1.055, 2.4) : (g / 12.92);
+        b = (b > 0.04045) ? Math.pow((b + 0.055) / 1.055, 2.4) : (b / 12.92);
+
+        // Convert to XYZ color space
+        double x = r * 0.4124564 + g * 0.3575761 + b * 0.1804375;
+        double y = r * 0.2126729 + g * 0.7151522 + b * 0.0721750;
+        double z = r * 0.0193339 + g * 0.1191920 + b * 0.9503041;
+
+        // Normalize for D65 illuminant
+        x /= 0.95047;
+        y /= 1.00000;
+        z /= 1.08883;
+
+        // Convert XYZ to LAB
+        x = (x > 0.008856) ? Math.pow(x, 1.0 / 3) : (7.787 * x + 16.0 / 116);
+        y = (y > 0.008856) ? Math.pow(y, 1.0 / 3) : (7.787 * y + 16.0 / 116);
+        z = (z > 0.008856) ? Math.pow(z, 1.0 / 3) : (7.787 * z + 16.0 / 116);
+
+        double l = 116 * y - 16;
+        double a = 500 * (x - y);
+        double bValue = 200 * (y - z);
+
+        return new double[]{l, a, bValue};
+    }
 }

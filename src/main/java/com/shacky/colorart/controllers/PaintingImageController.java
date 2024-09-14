@@ -28,13 +28,18 @@ public class PaintingImageController {
         return "Images scraped and saved successfully!";
     }
 
+    @GetMapping("/all-images")
+    public List<PaintingImage> getAllImages() {
+        return paintingImageService.getAllImages();
+    }
+
     @GetMapping
-    public List<PaintingImage> getImagesByColor(@RequestParam String color) {
+    public List<PaintingImage> getImagesByColor(@RequestParam Optional<String> color) {
         return paintingImageService.findImagesByColor(color);
     }
 
     @GetMapping("/open-images")
-    public String getCommandToOpenAllTheImagesFoundByColor(@RequestParam String color) {
+    public String getCommandToOpenAllTheImagesFoundByColor(@RequestParam Optional<String> color) {
         List<PaintingImage> images = paintingImageService.findImagesByColor(color);
         return windowsFileHelperService.getCommandToOpenAllTheImagesInTheBrowser(images);
     }
