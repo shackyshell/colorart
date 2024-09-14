@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -27,7 +28,14 @@ public class PaintingImageController {
 
     // Endpoint to return all dominant colors
     @GetMapping("/colors")
-    public Set<String> getAllDominantColors() {
+    public List<String> getAllDominantColors() {
         return paintingImageService.getAllDominantColors();
+    }
+
+    //Endpoint to return all color groups
+    @GetMapping("/color-groups")
+    public Map<Integer, List<String>> getAllDominantColorsGrouped() {
+        List<String> colors = paintingImageService.getAllDominantColors();
+        return paintingImageService.groupColors(colors);
     }
 }

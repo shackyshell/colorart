@@ -4,8 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,13 +44,46 @@ public class PaintingImageService {
     }
 
     // Method to get all dominant colors from all paintings
-    public Set<String> getAllDominantColors() {
+    public List<String> getAllDominantColors() {
         // Fetch all paintings
         List<PaintingImage> paintings = repository.findAll();
 
         // Extract colors from all paintings and return unique colors as a Set
         return paintings.stream()
                 .flatMap(painting -> painting.getColors().stream())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
+    }
+
+    private static final double SIMILARITY_THRESHOLD = 0.2; // Adjust based on requirements
+
+    // Group colors by similarity
+    public Map<Integer, List<String>> groupColors(List<String> hexColors) {
+        List<float[]> hslColors = new ArrayList<>();
+        for (String hex : hexColors) {
+            hslColors.add(generator.hexToHSL(hex));
+        }
+
+        Map<Integer, List<String>> colorGroups = new HashMap<>();
+        boolean[] grouped = new boolean[hexColors.size()];
+        int groupId = 0;
+
+        for (int i = 0; i < hexColors.size(); i++) {
+            if (!grouped[i]) {
+                List<String> group = new ArrayList<>();
+                group.add(hexColors.get(i));
+                grouped[i] = true;
+
+                for (int j = 0; j < hexColors.size(); j++) {
+                    if (i != j && !grouped[j] && generator.colorDistance(hslColors.get(i), hslColors.get(j)) < SIMILARITY_THRESHOLD) {
+                        group.add(hexColors.get(j));
+                        grouped[j] = true;
+                    }
+                }
+
+                colorGroups.put(groupId++, group);
+            }
+        }
+
+        return colorGroups;
     }
 }

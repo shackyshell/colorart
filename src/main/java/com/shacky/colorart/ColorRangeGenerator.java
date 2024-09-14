@@ -33,7 +33,7 @@ public class ColorRangeGenerator {
     }
 
     // Convert hex color to HSL
-    private float[] hexToHSL(String hex) {
+    float[] hexToHSL(String hex) {
         Color color = Color.decode(hex);
         float[] hsl = new float[3];
         rgbToHSL(color.getRed(), color.getGreen(), color.getBlue(), hsl);
@@ -107,5 +107,14 @@ public class ColorRangeGenerator {
         if (t < 1f / 2f) return q;
         if (t < 2f / 3f) return p + (q - p) * (2f / 3f - t) * 6;
         return p;
+    }
+
+
+    // Calculate Euclidean distance between two HSL colors
+    public static double colorDistance(float[] hsl1, float[] hsl2) {
+        double dh = Math.min(Math.abs(hsl1[0] - hsl2[0]), 1 - Math.abs(hsl1[0] - hsl2[0]));
+        double ds = hsl1[1] - hsl2[1];
+        double dl = hsl1[2] - hsl2[2];
+        return Math.sqrt(dh * dh + ds * ds + dl * dl);
     }
 }
