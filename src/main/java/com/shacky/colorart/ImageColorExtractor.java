@@ -17,7 +17,6 @@ import javax.imageio.ImageIO;
 public class ImageColorExtractor {
 
     public List<String> extractDominantColors(String imageUrl) throws IOException {
-//        try {
         // Step 1: Download and read the image from the provided URL
         BufferedImage image = ImageIO.read(new URL(imageUrl));
         if (image != null) {
@@ -29,15 +28,17 @@ public class ImageColorExtractor {
                     colorMap.put(rgb, colorMap.getOrDefault(rgb, 0) + 1);
                 }
             }
+            List<Map.Entry<Integer, Integer>> sortedColorMap = colorMap.entrySet()
+                    .stream()
+                    .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())).toList();
 
-            List<String> distinguishableColors = ColorRangeGenerator.getDistinguishableColors(colorMap.keySet().stream().map(this::toHex).toList(), 20.0);
-//            System.out.println("jul" + distinguishableColors);
+            List<String> distinguishableColors = ColorRangeGenerator.getDistinguishableColors(sortedColorMap.stream().map(entry -> toHex(entry.getKey())).toList(), 20.0);
 //            // Step 3: Sort by frequency of color occurrence and pick the top 3
             List<Map.Entry<Integer, Integer>> sortedColors = colorMap.entrySet()
                     .stream()
                     .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
                     .filter((colorEntry) -> distinguishableColors.contains( toHex(colorEntry.getKey())))
-                    .limit(10) // top 3 dominant colors
+                    .limit(10) // top 10 dominant colors
                     .collect(Collectors.toList());
 
             // Step 4: Convert the RGB color values to hex and return the list
@@ -50,10 +51,6 @@ public class ImageColorExtractor {
             return dominantColors;
         }
         return new ArrayList<>();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return new ArrayList<>();
-//        }
     }
 
     // Convert integer RGB value to hex color code
