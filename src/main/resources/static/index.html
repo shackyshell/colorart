@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Request Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        .box {
+         margin-bottom: 10px;
+        }
+        .colorSwatch {
+        height: 50px;
+        width: 50px;
+
+        }
+        .colorSwatchWrapper {
+         display: inline-block;
+         margin: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="box">
+        <input type="text" id="scrapeUrlInput" placeholder="Enter url to scrape">
+        <button id="scrapeButton">Scrape</button>
+    </div>
+    <div class="box">
+        <input type="text" id="inputField" placeholder="Enter something">
+        <button id="sendButton">Send</button>
+    </div>
+    <div id="response2Container" class="box"></div>
+    <div id="responseContainer" class="box"></div>
+</div>
+
+<script>
+        document.getElementById('sendButton').addEventListener('click', sendRequest);
+
+        document.getElementById('inputField').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendRequest();
+            }
+        });
+
+        function sendRequest() {
+        document.getElementById('responseContainer').innerHTML = '<div class="colorSwatch" style="background: pink;">lalala</div>';
+            const inputField = document.getElementById('inputField');
+            const value = inputField.value;
+
+<!--            if (!value) {-->
+<!--                alert('Please enter a value.');-->
+<!--                return;-->
+<!--            }-->
+
+            const apiUrl = 'http://localhost:8080/api/images/colors'; // Replace with your API URL
+
+            fetch(`${apiUrl}?query=${encodeURIComponent(value)}`)
+                .then(response => response.json())
+                .then(data => {
+                console.log('jul', data);
+                let innerHtml = '';
+                data.forEach((element) => {
+                innerHtml = innerHtml + `<div class="colorSwatchWrapper"><div class="colorSwatch" style="background: ${element};"></div>${element}</div>`;
+                })
+                    document.getElementById('responseContainer').innerHTML = innerHtml;
+                })
+                .catch(error => {
+                    document.getElementById('responseContainer').innerText = 'Error: ' + error;
+                });
+        }
+
+</script>
+<script>
+        document.getElementById('scrapeButton').addEventListener('click', sendRequest);
+
+        document.getElementById('scrapeUrlInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendRequest();
+            }
+        });
+            let isLoading = false;
+
+
+        function sendRequest() {
+        isLoading = true;
+        document.getElementById('response2Container').innerText = 'is loading...';
+            const scrapeUrlInput = document.getElementById('scrapeUrlInput');
+            const value = scrapeUrlInput.value;
+
+<!--            if (!value) {-->
+<!--                alert('Please enter a value.');-->
+<!--                return;-->
+<!--            }-->
+
+            const apiUrl = 'http://localhost:8080/api/images/scrape';
+
+            fetch(`${apiUrl}${value && `?url=${encodeURIComponent(value)}`}`, {
+    method: 'POST'})
+<!--                .then(response => {-->
+<!--                isLoading = false;-->
+<!--                return response})-->
+                .then(data => {
+                    document.getElementById('response2Container').innerText = 'loaded';
+                })
+                .catch(error => {
+                    document.getElementById('response2Container').innerText = 'Error: ' + error;
+                });
+        }
+
+</script>
+</body>
+</html>

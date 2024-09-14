@@ -1,5 +1,8 @@
-package com.shacky.colorart;
+package com.shacky.colorart.controllers;
 
+import com.shacky.colorart.PaintingImage;
+import com.shacky.colorart.PaintingImageService;
+import com.shacky.colorart.WindowsFileHelperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
