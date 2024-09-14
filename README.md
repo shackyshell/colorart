@@ -12,6 +12,17 @@ http://localhost:8080/h2-console
 - Password: password
 
 ### Running the app
+
+#### using ui
+
+```
+http://localhost:8080/index.html
+```
+click 'Scrape', wait until 'loaded' will be visible. Then click 'Load images' to present available images and their swatches.
+Additionally, you can filter images by providing hex color in the second input.
+First input is for passing url to scrape pages different than "https://www.parismuseescollections.paris.fr/fr/recherche/type/oeuvre/types-objet/330958".
+
+#### using terminal
 ```
 curl -X POST http://localhost:8080/api/images/scrape
 ```
@@ -20,6 +31,7 @@ or
 curl -X POST http://localhost:8080/api/images/scrape?url=yoururlofthewebsitewithpictures
 ```
 
+##### get script to open matching images in the browser
 ```
 curl -X GET "http://localhost:8080/api/images/open-images?color=%23383232"
 ```
