@@ -33,15 +33,14 @@ public class PaintingImageService {
     }
 
     @Transactional
-    public void scrapeAndStoreImages(Optional<String> url, Optional<Integer> distinguishableColorsThresholdPercentage) throws IOException {
+    public void scrapeAndStoreImages(Optional<String> url, Optional<Integer> distinguishableColorsThresholdPercentage, Optional<Integer> maxSwatches) throws IOException {
         List<String> imageUrls = scraperService.scrapeImageUrls(url);
 
         for (String imageUrl : imageUrls) {
             List<String> colors = colorExtractor.extractDominantColors(
                     imageUrl,
-                    distinguishableColorsThresholdPercentage.isPresent()  ?
-                            distinguishableColorsThresholdPercentage.get()
-                            : defaultDistinguishableColorsThresholdPercentage
+                    distinguishableColorsThresholdPercentage.orElse(defaultDistinguishableColorsThresholdPercentage),
+                    maxSwatches.orElse(10)
             );
 
             PaintingImage image = new PaintingImage();

@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
 @Service
 public class ImageColorExtractor {
 
-    public List<String> extractDominantColors(String imageUrl, double distinguishableThreshold) throws IOException {
+    public List<String> extractDominantColors(String imageUrl, double distinguishableThreshold, Integer maxSwatches) throws IOException {
         // Step 1: Download and read the image from the provided URL
         BufferedImage image = ImageIO.read(new URL(imageUrl));
         if (image != null) {
@@ -38,7 +38,7 @@ public class ImageColorExtractor {
                     .stream()
                     .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
                     .filter((colorEntry) -> distinguishableColors.contains( toHex(colorEntry.getKey())))
-                    .limit(10) // top 10 dominant colors
+                    .limit(maxSwatches) // top dominant colors
                     .collect(Collectors.toList());
 
             // Step 4: Convert the RGB color values to hex and return the list

@@ -23,8 +23,11 @@ public class PaintingImageController {
     private WindowsFileHelperService windowsFileHelperService;
 
     @PostMapping("/scrape")
-    public String scrapeAndStoreImages(@RequestParam Optional<String> url, @RequestParam Optional<Integer> distinguishableColorsThresholdPercentage) throws IOException {
-        paintingImageService.scrapeAndStoreImages(url, distinguishableColorsThresholdPercentage);
+    public String scrapeAndStoreImages(
+            @RequestParam Optional<String> url,
+                                       @RequestParam Optional<Integer> distinguishableColorsThresholdPercentage,
+            @RequestParam Optional<Integer> maxSwatches) throws IOException {
+        paintingImageService.scrapeAndStoreImages(url, distinguishableColorsThresholdPercentage, maxSwatches);
         return "Images scraped and saved successfully!";
     }
 

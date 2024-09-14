@@ -59,6 +59,10 @@
         <input type="number" min="0" max="100" id="distinguishableColorsThresholdInput" placeholder="distinguish colors with a difference higher than [%]">
     </div>
     <div class="box">
+        <p>Max number of swatches</p>
+        <input type="number" min="1" id="maxSwatchesInput" placeholder="Max number of swatches">
+    </div>
+    <div class="box">
         <input type="text" id="scrapeUrlInput" placeholder="Enter url to scrape">
         <button id="scrapeButton">Scrape</button>
     </div>
@@ -122,6 +126,7 @@
 <script type="text/javascript">
   document.getElementById("distinguishableColorsThresholdInput").setAttribute('value',20);
   document.getElementById("similarityThresholdInput").setAttribute('value',20);
+  document.getElementById("maxSwatchesInput").setAttribute('value',10);
 </script>
 <script>
         document.getElementById('scrapeButton').addEventListener('click', sendRequest);
@@ -140,10 +145,11 @@
             const scrapeUrlInput = document.getElementById('scrapeUrlInput');
             const value = scrapeUrlInput.value;
             const distinguishableColorsThresholdPercentage = distinguishableColorsThresholdInput.value || 20;
+            const maxSwatches = maxSwatchesInput.value || 10;
 
             const apiUrl = 'http://localhost:8080/api/images/scrape';
 
-            fetch(`${apiUrl}?distinguishableColorsThresholdPercentage=${distinguishableColorsThresholdPercentage}${value && `&url=${encodeURIComponent(value)}`}`, {
+            fetch(`${apiUrl}?maxSwatches=${maxSwatches}&distinguishableColorsThresholdPercentage=${distinguishableColorsThresholdPercentage}${value && `&url=${encodeURIComponent(value)}`}`, {
     method: 'POST'})
                 .then(data => {
                     document.getElementById('response2Container').innerText = 'loaded';
