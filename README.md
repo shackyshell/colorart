@@ -63,3 +63,9 @@ mvn clean package
 ```
 java -jar target/colorart-0.0.1-SNAPSHOT.jar
 ```
+
+### Running in development mode
+
+```
+mvn spring-boot:run
+```
