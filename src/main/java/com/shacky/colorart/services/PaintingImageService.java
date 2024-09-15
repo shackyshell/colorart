@@ -145,46 +145,45 @@ public class PaintingImageService {
         return colorGroups;
     }
 
-    public PaintingImage handleInvert(String imageUrl) throws Exception {
-        try {
+    public PaintingImage handleInvert(String imageUrl) throws IOException {
+//        try {
             PaintingImage paintingImage = getImageByUrl(imageUrl);
             BufferedImage image = ImageIO.read(new URL(imageUrl));
         BufferedImage image2 = ImageIO.read(new URL(imageUrl));
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(image2, "PNG", baos);
+        baos.flush();
+        byte[] byteArray = baos.toByteArray();
+        baos.close();
+
         if (image != null) {
             // Step 2: Get the pixel colors
             for (int x = 0; x < image.getWidth(); x++) {
                 for (int y = 0; y < image.getHeight(); y++) {
                     int rgb = image.getRGB(x, y);
-                    int invertedRgb = (0xFFFFFF - rgb) | 0xFF000000;
+                    int invertedRgb = (0xFFFFFFFF - rgb) | 0xFF000000;
                     image2.setRGB(x, y, invertedRgb);
                 }
             }
         }
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        ImageIO.write(image2, "png", baos);
-//        baos.flush();
-//        byte[] byteArray = baos.toByteArray();
-//        baos.close();
+
 
             final ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ImageIO.write(image2, "jpg", os);
+            ImageIO.write(image2, "PNG", os);
             byte[] byteArray2 = os.toByteArray();
             String base64Image = Base64.getEncoder().encodeToString(byteArray2);
             os.close();
 
             paintingImage.setBase64Image(base64Image);
-            return paintingImage;
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
 
-    private BufferedImage createImageFromBytes(byte[] imageData) {
-        ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
-        try {
-            return ImageIO.read(bais);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//            PaintingImage result = paintingImage;
+//            byte[] decodedBytes = Base64.getDecoder().decode(result.getBase64Image());
+//            BufferedImage invertedImage = ImageIO.read(new ByteArrayInputStream(decodedBytes));
+
+            return paintingImage;
+//        } catch (Exception e) {
+//            throw new Exception(e.getMessage());
+//        }
     }
 }
