@@ -7,11 +7,22 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
             min-height: 100vh;
             margin: 0;
+        }
+        nav {
+        display: flex;
+        }
+        .navButton {
+        display: block;
+        margin: 10px;
+        padding: 10px;
+        border: 1px solid black;
+        color: black;
+        text-decoration: none;
         }
         .container {
             text-align: center;
@@ -53,6 +64,9 @@
     </style>
 </head>
 <body>
+<nav>
+    <a href='http://localhost:8080/image-editor.html' class="navButton">Image Editor</a>
+</nav>
 <div class="container">
     <div class="box">
         <p>distinguish colors with a difference higher than [%]</p>

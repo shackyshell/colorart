@@ -12,7 +12,7 @@ public class ColorRangeGenerator {
 
 
     // Convert hex color to HSL
-    float[] hexToHSL(String hex) {
+    public float[] hexToHSL(String hex) {
         Color color = Color.decode(hex);
         float[] hsl = new float[3];
         rgbToHSL(color.getRed(), color.getGreen(), color.getBlue(), hsl);
@@ -60,7 +60,7 @@ public class ColorRangeGenerator {
     }
 
     // HSL to hex color conversion
-    String hslToHex(float hue, float saturation, float lightness) {
+    public String hslToHex(float hue, float saturation, float lightness) {
         float r, g, b;
 
         if (saturation == 0) {
@@ -172,5 +172,31 @@ public class ColorRangeGenerator {
         double bValue = 200 * (y - z);
 
         return new double[]{l, a, bValue};
+    }
+
+    public static String invertHexColor(String hexColor) {
+        // Ensure the hex color starts with "#", if not, prepend it
+        if (!hexColor.startsWith("#")) {
+            hexColor = "#" + hexColor;
+        }
+
+        // Remove the "#" to simplify the parsing process
+        hexColor = hexColor.substring(1);
+
+        // Parse the hex string to an integer
+        int color = Integer.parseInt(hexColor, 16);
+
+        // Invert the color using bitwise NOT (~) and mask with 0xFFFFFF to keep it 24-bit
+        int invertedColor = 0xFFFFFF - color;
+
+        // Format the new color back into a hex string and prepend with "#"
+        return String.format("#%06X", invertedColor);
+    }
+
+    public static void main(String[] args) {
+        // Test the function
+        String originalColor = "#FFFFFF";  // White
+        String invertedColor = invertHexColor(originalColor);
+        System.out.println("Original: " + originalColor + ", Inverted: " + invertedColor);  // Output: Original: #FFFFFF, Inverted: #000000
     }
 }

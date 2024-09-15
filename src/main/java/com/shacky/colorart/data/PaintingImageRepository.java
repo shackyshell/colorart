@@ -1,4 +1,4 @@
-package com.shacky.colorart;
+package com.shacky.colorart.data;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,4 +11,6 @@ public interface PaintingImageRepository extends JpaRepository<PaintingImage, Lo
     // Custom query to find paintings by matching colors
     @Query("SELECT p FROM PaintingImage p JOIN p.colors c WHERE c IN :colors")
     List<PaintingImage> findByColorsIn(@Param("colors") List<String> colors);
+
+    PaintingImage findByImageUrl(String imageUrl);
 }
