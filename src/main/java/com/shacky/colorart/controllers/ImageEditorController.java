@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.util.Optional;
 
 @RestController
@@ -33,6 +34,21 @@ public class ImageEditorController {
     public ResponseEntity<?> handleInvert(@RequestParam("imageUrl") String imageUrl) {
         try {
             PaintingImage imageEntity = paintingImageService.handleInvert(imageUrl);
+            return ResponseEntity.ok(imageEntity);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Failed to invert image from URL.");
+        }
+    }
+
+    @PostMapping("/api/editor/hue")
+    public ResponseEntity<?> handleInvert(
+            @RequestParam("imageUrl") String imageUrl,
+            @RequestParam("color")  String colorHex
+    ) {
+        try {
+            // Convert the hex string to a Color object
+            Color color = Color.decode(colorHex);
+            PaintingImage imageEntity = paintingImageService.handleChangeHue(imageUrl, color);
             return ResponseEntity.ok(imageEntity);
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Failed to invert image from URL.");

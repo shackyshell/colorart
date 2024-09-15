@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,6 +18,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -185,5 +187,53 @@ public class PaintingImageService {
 //        } catch (Exception e) {
 //            throw new Exception(e.getMessage());
 //        }
+    }
+
+
+    public PaintingImage handleChangeHue(String imageUrl, Color targetColor) throws IOException {
+        // Fetch the painting image
+        PaintingImage paintingImage = getImageByUrl(imageUrl);
+
+        // Read the image from the URL
+        BufferedImage image = ImageIO.read(new URL(imageUrl));
+
+        // Convert the target color to HSB to extract its hue
+        float[] targetHSB = Color.RGBtoHSB(targetColor.getRed(), targetColor.getGreen(), targetColor.getBlue(), null);
+
+        // Get the width and height of the image
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        // Adjust the hue of every pixel in the image
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgb = image.getRGB(x, y);
+                Color originalColor = new Color(rgb, true);  // Preserve alpha
+
+                // Convert the original color to HSB
+                float[] originalHSB = Color.RGBtoHSB(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue(), null);
+
+                // Set the hue to match the target hue, keep the original saturation and brightness
+                float newHue = targetHSB[0];
+                int adjustedRgb = Color.HSBtoRGB(newHue, originalHSB[1], originalHSB[2]);
+
+                // Combine the adjusted RGB with the original alpha channel
+                int newRgb = (originalColor.getAlpha() << 24) | (adjustedRgb & 0x00FFFFFF);
+
+                // Set the new RGB value for the pixel
+                image.setRGB(x, y, newRgb);
+            }
+        }
+
+        // Convert the modified image to a Base64 string
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            ImageIO.write(image, "jpg", os);
+            String base64Image = Base64.getEncoder().encodeToString(os.toByteArray());
+
+            // Set the Base64 image to the paintingImage object
+            paintingImage.setBase64Image(base64Image);
+        }
+
+        return paintingImage;
     }
 }

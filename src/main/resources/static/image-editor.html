@@ -53,6 +53,9 @@
         <button id="buttonInvert" class="btn btn-primary">
             Invert
         </button>
+        <button id="buttonChangeHue" class="btn btn-primary">
+            Change hue
+        </button>
     </div>
 </div>
 
@@ -125,6 +128,43 @@ const imageUrl = document.getElementById('imageUrl').value;
                 },
                 body: new URLSearchParams({
                     imageUrl: imageUrl
+                })
+            });
+                        if (!response.ok) {
+                throw new Error('Failed to load image.');
+            }
+
+            const data = await response.json();
+
+            // Display the images by setting the Base64 source
+            const base64Image = `data:image/png;base64,${data.base64Image}`;
+            const image2 = document.getElementById('image2');
+            image2.src = base64Image;
+
+            // Hide placeholders and show images
+            placeholder2.style.display = 'none';
+            image2.style.display = 'block';
+} catch (error) {
+   errorElement.textContent = error.message;
+}
+}
+</script>
+<script>
+<!-- buttonChangeHue-->
+document.getElementById('buttonChangeHue').addEventListener('click', handleChangeHue);
+
+async function handleChangeHue() {
+try {
+const imageUrl = document.getElementById('imageUrl').value;
+
+            const response = await fetch(apiUrl + '/api/editor/hue', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    imageUrl: imageUrl,
+                    color: "#fcba03",
                 })
             });
                         if (!response.ok) {
