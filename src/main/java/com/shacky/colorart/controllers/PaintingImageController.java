@@ -1,8 +1,8 @@
 package com.shacky.colorart.controllers;
 
-import com.shacky.colorart.PaintingImage;
-import com.shacky.colorart.PaintingImageService;
-import com.shacky.colorart.WindowsFileHelperService;
+import com.shacky.colorart.data.PaintingImage;
+import com.shacky.colorart.services.PaintingImageService;
+import com.shacky.colorart.services.WindowsFileHelperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/images")

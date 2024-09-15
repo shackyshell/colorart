@@ -1,4 +1,4 @@
-package com.shacky.colorart;
+package com.shacky.colorart.services;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

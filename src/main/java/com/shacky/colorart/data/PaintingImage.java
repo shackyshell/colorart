@@ -1,4 +1,4 @@
-package com.shacky.colorart;
+package com.shacky.colorart.data;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,10 +15,13 @@ public class PaintingImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String imageUrl;
 
     @ElementCollection
     private List<String> colors; // Store hex colors as strings
 
-    // Getters, setters, constructors
+    @Lob
+    @Column(nullable = false)
+    private String base64Image;
 }

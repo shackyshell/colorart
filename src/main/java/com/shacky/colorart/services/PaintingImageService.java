@@ -1,10 +1,21 @@
-package com.shacky.colorart;
+package com.shacky.colorart.services;
 
+import com.shacky.colorart.ColorRangeGenerator;
+import com.shacky.colorart.ImageColorExtractor;
+import com.shacky.colorart.data.PaintingImage;
+import com.shacky.colorart.data.PaintingImageRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,22 +48,39 @@ public class PaintingImageService {
         List<String> imageUrls = scraperService.scrapeImageUrls(url);
 
         for (String imageUrl : imageUrls) {
-            List<String> colors = colorExtractor.extractDominantColors(
-                    imageUrl,
-                    distinguishableColorsThresholdPercentage.orElse(defaultDistinguishableColorsThresholdPercentage),
-                    maxSwatches.orElse(10)
-            );
-
-            PaintingImage image = new PaintingImage();
-            image.setImageUrl(imageUrl);
-            image.setColors(colors);
-
-            repository.save(image);
+            saveImageFromUrl(imageUrl, distinguishableColorsThresholdPercentage, maxSwatches);
         }
+    }
+
+    @Transactional
+    public PaintingImage saveImageFromUrl(String imageUrl, Optional<Integer> distinguishableColorsThresholdPercentage, Optional<Integer> maxSwatches) throws IOException {
+        // Check if image already exists
+        PaintingImage existingImage = repository.findByImageUrl(imageUrl);
+        if (existingImage != null) {
+            return existingImage;
+        }
+
+        String base64Image = WindowsFileHelperService.imageToBase64(imageUrl);
+
+        List<String> colors = colorExtractor.extractDominantColors(
+                imageUrl,
+                distinguishableColorsThresholdPercentage.orElse(defaultDistinguishableColorsThresholdPercentage),
+                maxSwatches.orElse(10)
+        );
+        PaintingImage image = new PaintingImage();
+        image.setImageUrl(imageUrl);
+        image.setColors(colors);
+        image.setBase64Image(base64Image);
+
+        return repository.save(image);
     }
 
     public List<PaintingImage> getAllImages() {
         return repository.findAll();
+    }
+
+    public PaintingImage getImageByUrl(String imageUrl) {
+        return repository.findByImageUrl(imageUrl);
     }
 
     public List<PaintingImage> findImagesByColor(Optional<String> hexColor, Optional<Integer> similarityThreshold) {
@@ -115,5 +143,48 @@ public class PaintingImageService {
         }
 
         return colorGroups;
+    }
+
+    public PaintingImage handleInvert(String imageUrl) throws Exception {
+        try {
+            PaintingImage paintingImage = getImageByUrl(imageUrl);
+            BufferedImage image = ImageIO.read(new URL(imageUrl));
+        BufferedImage image2 = ImageIO.read(new URL(imageUrl));
+        if (image != null) {
+            // Step 2: Get the pixel colors
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    int rgb = image.getRGB(x, y);
+                    int invertedRgb = (0xFFFFFF - rgb) | 0xFF000000;
+                    image2.setRGB(x, y, invertedRgb);
+                }
+            }
+        }
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        ImageIO.write(image2, "png", baos);
+//        baos.flush();
+//        byte[] byteArray = baos.toByteArray();
+//        baos.close();
+
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(image2, "jpg", os);
+            byte[] byteArray2 = os.toByteArray();
+            String base64Image = Base64.getEncoder().encodeToString(byteArray2);
+            os.close();
+
+            paintingImage.setBase64Image(base64Image);
+            return paintingImage;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    private BufferedImage createImageFromBytes(byte[] imageData) {
+        ByteArrayInputStream bais = new ByteArrayInputStream(imageData);
+        try {
+            return ImageIO.read(bais);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
