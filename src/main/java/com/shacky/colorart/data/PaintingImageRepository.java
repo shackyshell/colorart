@@ -12,6 +12,5 @@ public interface PaintingImageRepository extends JpaRepository<PaintingImage, Lo
     @Query("SELECT p FROM PaintingImage p JOIN p.colors c WHERE c IN :colors")
     List<PaintingImage> findByColorsIn(@Param("colors") List<String> colors);
 
-//    @Query("SELECT p FROM PaintingImage WHERE p.IMAGE_URL = imageUrl")
     PaintingImage findByImageUrl(String imageUrl);
 }
